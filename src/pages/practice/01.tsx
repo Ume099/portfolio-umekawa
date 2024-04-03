@@ -1,42 +1,17 @@
 import { NextPage } from 'next';
-import { ChangeEvent, useState } from 'react';
 
 import Button from '@/components/common/parts/Button';
-
-type Task = {
-  label: string;
-  isCompleted: boolean;
-};
+import { useTodo } from '@/hooks/useTodo';
 
 const Page: NextPage = () => {
-  const [taskLabel, setTaskLabel] = useState('');
-  const [taskList, setTaskList] = useState<Task[]>([]);
-
-  const handleSetInputValue = (e: ChangeEvent<HTMLInputElement>) => {
-    setTaskLabel(e.target.value);
-  };
-
-  const handleAddTask = () => {
-    if (!taskLabel.trim()) {
-      return;
-    }
-    setTaskList((prevState) => [...prevState, { label: taskLabel, isCompleted: false }]);
-    setTaskLabel('');
-  };
-
-  const deleteTask = (index: number) => {
-    setTaskList((prevState) => prevState.filter((_, subIndex) => subIndex !== index));
-  };
-
-  const handleTaskComplete = (index: number) => {
-    setTaskList((prevTaskList) =>
-      prevTaskList.map((prevTask, subIndex) =>
-        // 完了をトグルにする
-        subIndex === index ? { ...prevTask, isCompleted: !prevTask.isCompleted } : prevTask,
-      ),
-    );
-  };
-
+  const {
+    taskList,
+    handleSetInputValue,
+    handleAddTask,
+    taskLabel,
+    deleteTask,
+    handleTaskComplete,
+  } = useTodo();
   return (
     <div className="mx-auto mt-8 max-w-4xl">
       <div className="flex justify-center">
