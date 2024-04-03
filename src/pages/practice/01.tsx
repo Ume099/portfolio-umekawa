@@ -9,9 +9,11 @@ const Page: NextPage = () => {
     handleSetInputValue,
     handleAddTask,
     taskLabel,
-    deleteTask,
+    handleDeleteTask,
     handleTaskComplete,
+    undoDeleteTask,
   } = useTodo();
+
   return (
     <div className="mx-auto mt-8 max-w-4xl">
       <div className="flex justify-center">
@@ -29,28 +31,62 @@ const Page: NextPage = () => {
           </div>
           {/* タスクを表示 */}
           <div className="mt-8 rounded-md border p-4 text-center ">
-            <h2>==========TODOリスト==========</h2>
+            <h2>=============タスク=============</h2>
             <div className="mt-4">
               <ul>
-                {taskList.map((todo, index) => (
-                  <li key={index} className="mb-2 flex justify-between border-b">
-                    <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
-                    <div className="flex gap-x-2">
-                      <Button
-                        onClick={() => handleTaskComplete(index)}
-                        label="完了"
-                        variant="primary"
-                        className="mb-2"
-                      />
-                      <Button
-                        onClick={() => deleteTask(index)}
-                        label="削除"
-                        variant="error-secondary"
-                        className="mb-2"
-                      />
-                    </div>
-                  </li>
-                ))}
+                {taskList.map((todo, index) =>
+                  todo.isDeleted ? (
+                    ''
+                  ) : (
+                    <li key={index} className="mb-2 flex justify-between border-b">
+                      <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
+                      <div className="flex gap-x-2">
+                        <Button
+                          onClick={() => handleTaskComplete(index)}
+                          label="完了"
+                          variant="primary"
+                          className="mb-2"
+                        />
+                        <Button
+                          onClick={() => handleDeleteTask(index)}
+                          label="削除"
+                          variant="error-secondary"
+                          className="mb-2"
+                        />
+                      </div>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 border-b"></div>
+
+          {/* 削除済みタスクを表示 */}
+          <div className="mt-8 rounded-md border p-4 text-center ">
+            <h2>==========削除されたタスク==========</h2>
+            <div className="mt-4">
+              <ul>
+                {taskList.map((todo, index) =>
+                  todo.isDeleted ? (
+                    <li key={index} className="mb-2 flex justify-between border-b">
+                      <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
+                      <div className="flex gap-x-2">
+                        <Button
+                          onClick={() =>
+                            todo.isDeleted ? undoDeleteTask(index) : handleDeleteTask(index)
+                          }
+                          label="Undo"
+                          variant="error-secondary"
+                          className="mb-2"
+                        />
+                      </div>
+                    </li>
+                  ) : (
+                    ''
+                  ),
+                )}
               </ul>
             </div>
           </div>
