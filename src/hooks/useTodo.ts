@@ -30,10 +30,15 @@ export const useTodo: UseTodo = () => {
     if (!taskLabel.trim()) {
       return;
     }
-    setTaskList((prevState) => [
-      ...prevState,
-      { label: taskLabel, isCompleted: false, originalIsCompleted: false, isDeleted: false },
-    ]);
+
+    const newTask = {
+      label: taskLabel,
+      isCompleted: false,
+      originalIsCompleted: false,
+      isDeleted: false,
+    };
+
+    setTaskList((prevTaskList) => [...prevTaskList, newTask]);
     setTaskLabel('');
   };
 

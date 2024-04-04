@@ -20,9 +20,9 @@ const Page: NextPage = () => {
         <div className="text-center text-base">
           <div>
             <input
-              onChange={handleSetInputValue}
+              onChange={(e) => handleSetInputValue(e)}
               value={taskLabel}
-              className="rounded-md border px-3 py-2"
+              className="w-full rounded-md border px-3 py-2"
             />
           </div>
           {/* 追加ボタン */}
@@ -34,28 +34,27 @@ const Page: NextPage = () => {
             <h2>=============タスク=============</h2>
             <div className="mt-4">
               <ul>
-                {taskList.map((todo, index) =>
-                  todo.isDeleted ? (
-                    ''
-                  ) : (
-                    <li key={index} className="mb-2 flex justify-between border-b">
-                      <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
-                      <div className="flex gap-x-2">
-                        <Button
-                          onClick={() => handleTaskComplete(index)}
-                          label="完了"
-                          variant="primary"
-                          className="mb-2"
-                        />
-                        <Button
-                          onClick={() => handleDeleteTask(index)}
-                          label="削除"
-                          variant="error-secondary"
-                          className="mb-2"
-                        />
-                      </div>
-                    </li>
-                  ),
+                {taskList.map(
+                  (todo, index) =>
+                    todo.isDeleted || (
+                      <li key={index} className="mb-2 flex justify-between border-b">
+                        <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
+                        <div className="flex gap-x-2">
+                          <Button
+                            onClick={() => handleTaskComplete(index)}
+                            label="完了"
+                            variant="primary"
+                            className="mb-2"
+                          />
+                          <Button
+                            onClick={() => handleDeleteTask(index)}
+                            label="削除"
+                            variant="error-secondary"
+                            className="mb-2"
+                          />
+                        </div>
+                      </li>
+                    ),
                 )}
               </ul>
             </div>
@@ -68,24 +67,21 @@ const Page: NextPage = () => {
             <h2>==========削除されたタスク==========</h2>
             <div className="mt-4">
               <ul>
-                {taskList.map((todo, index) =>
-                  todo.isDeleted ? (
-                    <li key={index} className="mb-2 flex justify-between border-b">
-                      <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
-                      <div className="flex gap-x-2">
-                        <Button
-                          onClick={() =>
-                            todo.isDeleted ? undoDeleteTask(index) : handleDeleteTask(index)
-                          }
-                          label="Undo"
-                          variant="error-secondary"
-                          className="mb-2"
-                        />
-                      </div>
-                    </li>
-                  ) : (
-                    ''
-                  ),
+                {taskList.map(
+                  (todo, index) =>
+                    todo.isDeleted && (
+                      <li key={index} className="mb-2 flex justify-between border-b">
+                        <span className={todo.isCompleted ? 'line-through' : ''}>{todo.label}</span>
+                        <div className="flex gap-x-2">
+                          <Button
+                            onClick={() => undoDeleteTask(index)}
+                            label="Undo"
+                            variant="error-secondary"
+                            className="mb-2"
+                          />
+                        </div>
+                      </li>
+                    ),
                 )}
               </ul>
             </div>
