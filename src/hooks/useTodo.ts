@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react';
 
-export type Task = {
+type Task = {
   label: string;
   isCompleted: boolean;
   originalIsCompleted: boolean;
