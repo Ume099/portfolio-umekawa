@@ -10,7 +10,7 @@ type UseTodo = () => {
   handleSetInputValue: (e: ChangeEvent<HTMLInputElement>) => void;
   taskLabel: string;
   taskList: Task[] | undefined;
-  handleAddTask: (index: number) => void;
+  handleAddTask: () => void;
   handleDeleteTask: (index: number) => void;
   handleUpdateTask: (id: number) => void;
 };
