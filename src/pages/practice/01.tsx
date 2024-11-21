@@ -41,7 +41,7 @@ const Page: NextPage = () => {
                           <span className={todo.completed ? 'line-through' : ''}>{todo.label}</span>
                           <div className="flex gap-x-2">
                             <Button
-                              onClick={() => handleUpdateTask(todo.id)}
+                              onClick={() => handleUpdateTask(todo.id, todo.completed)}
                               label="完了"
                               variant="primary"
                               className="mb-2"
@@ -75,7 +75,7 @@ const Page: NextPage = () => {
                           <span className={todo.completed ? 'line-through' : ''}>{todo.label}</span>
                           <div className="flex gap-x-2">
                             <Button
-                              onClick={() => console.log(todo.id)}
+                              onClick={() => handleUpdateTask(todo.id, todo.completed)}
                               label="未完了にする"
                               variant="error-secondary"
                               className="mb-2"

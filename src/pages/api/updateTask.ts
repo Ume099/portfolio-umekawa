@@ -2,49 +2,45 @@ import { db } from '@/lib/firebase/firebase-admin';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-type ResponseData = {
-  success: boolean;
-  message?: string;
-};
+type ReqBody = { id: number; completed: boolean };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
+const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
+    return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  type ReqBody = {
-    id: number;
-    fieldName: string;
-    fieldValue: string;
-  };
+  const { id, completed } = req.body as ReqBody;
 
-  const { id, fieldName, fieldValue } = req.body as ReqBody;
-
-  if (!id || !fieldName) {
-    console.log('testtstst');
-
-    console.log(id);
-    console.log(fieldName);
-    return res.status(400).json({ success: false, message: 'Invalid request data' });
+  // 必須フィールドのチェック
+  if (id === undefined) {
+    return res.status(400).json({ message: 'Bad Request: Missing required fields' });
   }
 
   try {
-    const querySnapshot = await db.collection('data').where('id', '==', id).limit(1).get();
+    const snapshot = await db.collection('data').where('id', '==', id).get();
 
-    let docRef;
-    if (!querySnapshot.empty) {
-      docRef = querySnapshot.docs[0].ref;
+    if (snapshot.empty) {
+      res.status(404).json({ message: 'No matching documents found' });
+      return;
     }
 
-    if (!docRef) {
-      return res.status(500).json({ success: false, message: 'Failed to update document' });
-    }
-
-    await docRef.update({
-      [fieldName]: fieldValue,
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => {
+      batch.update(doc.ref, { completed: completed });
     });
-    return res.status(200).json({ success: true });
+
+    await batch.commit();
+
+    res.status(200).json({ message: 'Document(s) deleted successfully' });
+
+    return res.status(201).json({ message: 'Document created successfully' });
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Failed to update document' });
+    console.error('Error adding document:', error);
+    return res.status(500).json({
+      message: 'Internal Server Error',
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
-}
+};
+
+export default handler;

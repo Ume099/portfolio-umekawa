@@ -12,7 +12,7 @@ type UseTodo = () => {
   taskList: Task[] | undefined;
   handleAddTask: () => void;
   handleDeleteTask: (index: number) => void;
-  handleUpdateTask: (id: number) => void;
+  handleUpdateTask: (id: number, completed: boolean) => void;
 };
 
 const fetcher = (url: string) =>
@@ -62,11 +62,15 @@ export const useTodo: UseTodo = () => {
     }
   };
 
-  const handleUpdateTask = async () => {
-    const data: Task = { id: Date.now(), completed: false, label: 'test', isDeleted: false };
+  const handleCompleteTask = async (id: number, completed: boolean) => {
     try {
-      const res = await axios.post('/api/updateTask', data);
-      toast.info('タスクを追加しました');
+      console.log(completed);
+      if (completed) {
+        const res = await axios.post('/api/updateTask', { id, completed: false });
+      } else {
+        const res = await axios.post('/api/updateTask', { id, completed: true });
+      }
+      toast.info(`${completed ? 'タスクを完了にしました' : 'タスクを未完了にしました。'}`);
     } catch (e) {
       console.log(e);
     } finally {
@@ -80,6 +84,6 @@ export const useTodo: UseTodo = () => {
     taskList,
     handleAddTask,
     handleDeleteTask,
-    handleUpdateTask,
+    handleUpdateTask: handleCompleteTask,
   };
 };
