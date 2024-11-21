@@ -4,3 +4,5 @@ export type Task = {
   isDeleted: boolean;
   id: number;
 };
+
+export const COLLECTION_NAME_DATA = 'data';

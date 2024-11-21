@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { FirebaseError } from 'firebase/app';
 import { ChangeEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import useSWR from 'swr';
@@ -9,6 +10,7 @@ type UseTodo = () => {
   handleSetInputValue: (e: ChangeEvent<HTMLInputElement>) => void;
   taskLabel: string;
   taskList: Task[] | undefined;
+  handleAddTask: (index: number) => void;
   handleDeleteTask: (index: number) => void;
   handleUpdateTask: (id: number) => void;
 };
@@ -21,10 +23,29 @@ const fetcher = (url: string) =>
 
 export const useTodo: UseTodo = () => {
   const [taskLabel, setTaskLabel] = useState('');
-  const { data: taskList } = useSWR<Task[]>('/api/fetchTasks?collectionName=data', fetcher);
+  const { data: taskList, mutate } = useSWR<Task[]>('/api/fetchTasks?collectionName=data', fetcher);
 
   const handleSetInputValue = (e: ChangeEvent<HTMLInputElement>) => {
     setTaskLabel(e.target.value);
+  };
+
+  const handleAddTask = async () => {
+    if (!taskLabel.trim()) {
+      toast.warn('ラベルを入力して下さい');
+      return;
+    }
+    const data: Task = { id: Date.now(), completed: false, label: taskLabel, isDeleted: false };
+    try {
+      const res = await axios.post('/api/addTask', data);
+      toast.info('タスクを追加しました');
+    } catch (e) {
+      toast.error(
+        `タスクの追加に失敗しました。${e instanceof Error && e.message} ${e instanceof FirebaseError && 'エラーコード' + e.code}`,
+      );
+    } finally {
+      setTaskLabel('');
+      await mutate();
+    }
   };
 
   const handleDeleteTask = async (id: number) => {
@@ -33,22 +54,23 @@ export const useTodo: UseTodo = () => {
         data: { fieldValue: id },
       });
       console.log(res);
-      toast.info('削除しました。');
+      toast.info('タスクを削除しました');
     } catch (e) {
       console.log(e);
+    } finally {
+      await mutate();
     }
   };
 
-  const handleUpdateTask = async (id: number) => {
+  const handleUpdateTask = async () => {
+    const data: Task = { id: Date.now(), completed: false, label: 'test', isDeleted: false };
     try {
-      const res = await axios.post('/api/updateTask', {
-        id,
-        fieldName: 'completed',
-        fieldValue: true,
-      });
-      toast.info('一つのタスクを完了しました！');
+      const res = await axios.post('/api/updateTask', data);
+      toast.info('タスクを追加しました');
     } catch (e) {
       console.log(e);
+    } finally {
+      await mutate();
     }
   };
 
@@ -56,6 +78,7 @@ export const useTodo: UseTodo = () => {
     handleSetInputValue,
     taskLabel,
     taskList,
+    handleAddTask,
     handleDeleteTask,
     handleUpdateTask,
   };
