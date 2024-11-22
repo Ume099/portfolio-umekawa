@@ -10,7 +10,7 @@ const Page: NextPage = () => {
       <div className="flex justify-center">
         <ul>
           <li>
-            <Link href="/practice/01" className="text-lg underline">
+            <Link href="/todo/01" className="text-lg underline">
               TODO
             </Link>
           </li>
