@@ -11,8 +11,12 @@ type UseTodo = () => {
   taskLabel: string;
   taskList: Task[] | undefined;
   handleAddTask: () => void;
+  isAddButtonLoading: boolean;
   handleDeleteTask: (index: number) => void;
+  isDeleteButtonLoading: number;
   handleUpdateTask: (id: number, completed: boolean) => void;
+  isCompleteButtonLoading: number;
+  error: Error | undefined;
 };
 
 const fetcher = (url: string) =>
@@ -23,7 +27,14 @@ const fetcher = (url: string) =>
 
 export const useTodo: UseTodo = () => {
   const [taskLabel, setTaskLabel] = useState('');
-  const { data: taskList, mutate } = useSWR<Task[]>('/api/fetchTasks?collectionName=data', fetcher);
+  const [isAddButtonLoading, setIsAddButtonLoading] = useState(false);
+  const [isCompleteButtonLoading, setIsCompleteButtonLoading] = useState(0);
+  const [isDeleteButtonLoading, setIsDeleteButtonLoading] = useState(0);
+  const {
+    data: taskList,
+    mutate,
+    error,
+  } = useSWR<Task[], Error | undefined>('/api/fetchTasks?collectionName=data', fetcher);
 
   const handleSetInputValue = (e: ChangeEvent<HTMLInputElement>) => {
     setTaskLabel(e.target.value);
@@ -34,6 +45,7 @@ export const useTodo: UseTodo = () => {
       toast.warn('ラベルを入力して下さい');
       return;
     }
+    setIsAddButtonLoading(true);
     const data: Task = { id: Date.now(), completed: false, label: taskLabel, isDeleted: false };
     try {
       const res = await axios.post('/api/addTask', data);
@@ -45,10 +57,12 @@ export const useTodo: UseTodo = () => {
     } finally {
       setTaskLabel('');
       await mutate();
+      setIsAddButtonLoading(false);
     }
   };
 
   const handleDeleteTask = async (id: number) => {
+    setIsDeleteButtonLoading(id);
     try {
       const res = await axios.delete<{ fieldName: number }>('/api/deleteTask', {
         data: { fieldValue: id },
@@ -59,10 +73,13 @@ export const useTodo: UseTodo = () => {
       console.log(e);
     } finally {
       await mutate();
+
+      setIsDeleteButtonLoading(0);
     }
   };
 
   const handleCompleteTask = async (id: number, completed: boolean) => {
+    setIsCompleteButtonLoading(id);
     try {
       console.log(completed);
       if (completed) {
@@ -75,6 +92,8 @@ export const useTodo: UseTodo = () => {
       console.log(e);
     } finally {
       await mutate();
+
+      setIsCompleteButtonLoading(0);
     }
   };
 
@@ -83,7 +102,11 @@ export const useTodo: UseTodo = () => {
     taskLabel,
     taskList,
     handleAddTask,
+    isAddButtonLoading,
     handleDeleteTask,
+    isDeleteButtonLoading,
     handleUpdateTask: handleCompleteTask,
+    isCompleteButtonLoading,
+    error,
   };
 };

@@ -9,9 +9,22 @@ const Page: NextPage = () => {
     taskLabel,
     taskList,
     handleAddTask,
+    isAddButtonLoading,
     handleDeleteTask,
+    isDeleteButtonLoading,
     handleUpdateTask,
+    isCompleteButtonLoading,
+    error,
   } = useTodo();
+
+  if (error) {
+    return (
+      <div>
+        <p>エラーが発生しました。</p>
+        <p>{error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto mt-8 max-w-4xl">
@@ -26,7 +39,12 @@ const Page: NextPage = () => {
           </div>
           {/* 追加ボタン */}
           <div className="mt-4">
-            <Button onClick={() => handleAddTask()} label="追加" variant="primary" />
+            <Button
+              onClick={() => handleAddTask()}
+              label="追加"
+              variant="primary"
+              loading={isAddButtonLoading}
+            />
           </div>
           {/* タスクを表示 */}
           <div className="mt-8 rounded-md border p-4 text-center ">
@@ -45,12 +63,14 @@ const Page: NextPage = () => {
                               label="完了"
                               variant="primary"
                               className="mb-2"
+                              loading={todo.id === isCompleteButtonLoading}
                             />
                             <Button
                               onClick={() => handleDeleteTask(todo.id)}
                               label="削除"
                               variant="error-secondary"
                               className="mb-2"
+                              loading={todo.id === isDeleteButtonLoading}
                             />
                           </div>
                         </li>
