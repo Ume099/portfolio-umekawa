@@ -96,6 +96,7 @@ export const useTodo: UseTodo = () => {
       setIsCompleteButtonLoading(0);
     }
   };
+  taskList?.sort((task1, task2) => task1.id - task2.id);
 
   return {
     handleSetInputValue,
